@@ -1,3 +1,8 @@
+-- Chapter 1
+
+
+
+
 -- Chapter 12 : Monoids
 
 -- List type as applicative functor
