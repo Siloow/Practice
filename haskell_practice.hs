@@ -5,12 +5,13 @@
 -- If you encounter "-- =" it means the result of the "-- >" above.
 -- [Some kind of title] means a new paragraph or chapter.
 -- Each chapter can be uncommeneted seperately so that the examples do interfere with eachother.
+-- Search for [REREAD] every time you open the file. This are parts that you didn't really understand yet. 
 -- Have fun
 
 
 -- Dictionary
--- Statement : defines an action, consists of expressions (What code does)
--- Expression : A collection of symbols that jointly express a quantity. It evaluates to a value. (What code is)
+-- Statement : defines an action, consists of expressions (What code does) Ex. (print y)
+-- Expression : A collection of symbols that jointly express a quantity. It evaluates to a value. (What code is) Ex. (y = x + 1)
 -- 'Let' keyword : Used to define a name (and more..)
 -- Predicate : condition
 
@@ -156,6 +157,7 @@ isL1biggerThanL2' = [1,2,1] > [2,1,0]
 -- > take 5 (repeat 5)
 -- = [5,5,5,5,5]
 -- replicate : is an easier way to create a list composed of a single item. It is like take 5 (repeat 5) with the take part built in.
+-- This function also works with lists that contain multiple values.
 -- > replicate 3 10
 -- = [10,10,10]
 
@@ -182,6 +184,8 @@ multiValueListResult = [x+y | x <- [1,2,3], y <- [10,100,1000]]
 -- = [11,101,1001,12,102,1002,13,103,1003]
 -- x is draw from [1,2,3] and y is drawn from [10,100,1000]. While x is 1, y takes on every value from [10,100,1000]
 -- and adds 1 to every element that y becomes.
+-- To use this function with paramaters rewrite it like this:
+multiValueListResult' xs ys = [x+y | x <- xs, y <- ys]
 
 -- Another example 
 length' xs = sum [1 | _ <- xs]
@@ -209,6 +213,7 @@ listCeption xxs = [ [ x | x <- xs, even x ] | xs <- xxs]
 
 -- A tuple of size two (pair) and a tuple of size three (triple) are treated as two distrinct types, which means a list can't be
 -- composed of both pairs and triples. A tuple (1, "Kaas") is a different type than ("Kaas", 1).
+-- (True, 'a') has a type of (Bool, Char)
 
 -- Some functions that operate on tuples.
 -- fst : takes a pair and returns its first component
@@ -220,7 +225,7 @@ listCeption xxs = [ [ x | x <- xs, even x ] | xs <- xxs]
 -- These functions only work on pairs.
 
 -- Another example
--- zip : takes two lists, then "zips" them together into one list by matching elements into pairs. 
+-- zip : takes two lists, then "zips" them together into one list by matching elements into pairs. Again in lexicographical order.
 -- > zip [1,2,3,4,5] [5,5,5,5,5]
 -- = [(1,5),(2,5),(3,5),(4,5),(5,5)]
 -- Zip can take two lists that contain elements of different types
@@ -230,7 +235,148 @@ listCeption xxs = [ [ x | x <- xs, even x ] | xs <- xxs]
 -- > zip [5,3,2,6,2,7,2,5,4,6,6] ["im","a","turtle"]  
 -- = [(5,"im"),(3,"a"),(2,"turtle")]
 
+-- [END CHAPTER1]
+
 -- [Chapter 2 : Types]
+-- The (::) operator is eard as "has type of".
+-- Explicit types are always denoted with the first letter in uppercase.
+
+-- When writing your own functions, you can choose to give them an explicit type declaration. 
+-- The following shows the type declaration for the removeNonUppercase function
+removeNonUppercase' :: [Char] -> [Char]
+removeNonUppercase' st = [ c | c <- st, c `elem` ['A'..'Z']]
+
+-- Specifying a fuction that takes several paramaters (It is actually partial application, but that is explained later on):
+addThree :: Int -> Int -> Int -> Int
+addThree x y z = x + y + z
+
+-- [Common Haskell Types]
+-- Int 
+-- -- Stands for integer. Used for whole numbers. It is bounded which means it has a minimum and maximum value.
+-- Integer
+-- -- Same as Int but not bounded.
+-- Float
+-- -- A real floating-point number with single precision (4 bytes or 32 bits)
+-- Double
+-- -- A real floating-point number with double the precision.
+-- Bool
+-- -- A boolean type. Holds the value True or False.
+-- Char
+-- -- Represenets Unicode characters. Denoted with single qoutes.
+-- Tuples
+-- -- Are types, which depends on their length and the type of its component(s). 
+-- -- Can have at max 62 elements.
+-- -- You can have an empty tuple denoted as ().
+
+-- [Type variables]
+-- Type variables allow functions to operate on values of various types in a type-safe manner.
+-- They show up in type declarations as lowercase letters.
+-- Functions that use type variables are called polymorphic functions. 
+
+-- > :t fst
+-- = fst :: (a, b) -> a
+-- fst takes a tuple and returns an elements that is of the same type as its first item. Even though a and b are different
+-- types variables, they don't neccessarily need to be different types. It just means that the first item's type and the return value's
+-- type will be the same. 
+
+-- [Type Classes 101]
+-- A 'type class' is an interface that defines some behaviour. If a type is an instance of a type class, then it supports and implements
+-- the behaviour the type class describes. More specifically, a type class specifies a bunch of functions, and when we decide to make a type an
+-- instance of a type class, we define what those functions means for that type.
+-- In a type class multiple class constraints are seperated by commas inside the parentheses.
+
+-- Example
+-- > :t (==)
+-- = (==) :: (Eq a) => a -> a -> Bool
+-- The equality operator (==) is actually a function. If a function is composed of only special characters, it's considered an
+-- infix function by default. To examine its type, pass it to another function, or call it as a prefix function, we need to surround
+-- it in parentheses. 
+-- Everything before the (==>) symbol is called a class constraint.
+-- This function is read as : The equality function takes any two values that are of the same type and return a Bool. The type of those two values
+-- must be an instance of the Eq class. 
+
+-- What follows are some common Haskell type classes.
+-- [The Eq type class]
+-- Eq is used for types that support equality testing.
+-- The functions its instances implement are (==) and (/=).
+-- This means that if there's an Eq class constraint for a type variable in a function, it uses == or /= somewhere in its definition.
+-- When a type implements a fuction, that means it defines what the function does when used with that particular type. [REREAD]
+-- > 5 == 5
+-- = True
+
+-- [The Ord type class]
+-- Ord is a type class for types whose values van be put in some order.
+-- Ord covers all the standard comparison functions such as (>), (<), (>=), (<=)
+-- The compare function takes two values whose type is an Ord instance and returns an Ordering.
+-- Ordering is a type can can be GT, LT, or EQ. (Greater than, lesser than or equal).
+-- > "Kaasbroodje" < "Bier"
+-- = False
+-- > "Kaasbroodje" `compare` "Bier"
+-- = GT
+
+-- [The Show type class]
+-- Values whose types are instances of the Show type class can be represented as strings. 
+-- The most commonly used function that operates on instances of this type class is show. Show prints a given value as a string.
+-- > show 3
+-- = "3"
+
+-- [The Read type class]
+-- Sort of the opposite of the type class Show. The read function takes a string and return a value whose type is
+-- an instance of Read:
+-- > read "True" || False
+-- = True
+-- > read "8.2" + 3.8
+-- = 12.0
+
+-- Type annotations are a way to explicitly tell Haskell what type of an expression should be. We do this by adding :: to the end
+-- of the expression and then specifying a type.
+-- > read "5" :: Int
+-- = 5
+-- > read "5" :: Float
+-- = 5.0
+
+-- [The Enum type class]
+-- Enum instances are sequentially ordered types-- their values can be enumerated. 
+-- Values can be used in list ranges.
+-- They also have defined successors (succ) and predecessors (pred).
+-- > ['a'..'e']
+-- = "abcde"
+-- > [3 .. 5]
+-- = [3,4,5]
+-- > succ 'B'
+-- = 'C'
+
+-- [The Bounded type class]
+-- Instances of the Bounded type class have an upper bound and lower bound, which can be checked by using the minBound and maxBound functions.
+-- > minBound :: Int
+-- = -9223372036854775808
+
+-- These functions are interesting because of their type : 
+-- (Bounded a) => a
+-- In a sense, they are polymorphic constants. 
+
+-- [The Num type class]
+-- Num is a numeric type class. Its instances can act like numbers. 
+-- > :t 20
+-- = (Num t) => t
+-- To be an instance of Num, a type must already be in Show and Eq.
+
+-- [The Floating type class]
+-- The Floating type class includes the Float and Double types, which are used to store floating-point numbers.
+
+-- [The Integral type class]
+-- Integral is another numeric type class. While Num includes all numbers, including real number integers, the Integral class includes
+-- only integral (whole) numbers. This type class includes the Int and Integer types.
+
+-- > fromIntegral :: (Integral, Num b) => a -> b
+-- Here we can see that fromIntegral takes an integral number and turns in into a more general number.
+-- This is handy when you want to work with both integral and floating-point numbers.
+
+-- > length :: [a] -> Int
+-- We cannot add a floating-point number to this list filled with integers.
+-- To get around this, we can use fromIntegral:
+-- > fromIntegral (length([1,2,3,4]) + 3.2)
+-- = 7.2
 
 
 
