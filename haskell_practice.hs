@@ -238,7 +238,7 @@ listCeption xxs = [ [ x | x <- xs, even x ] | xs <- xxs]
 -- [END CHAPTER1]
 
 -- [Chapter 2 : Types]
--- The (::) operator is eard as "has type of".
+-- The (::) operator is read as "has type of".
 -- Explicit types are always denoted with the first letter in uppercase.
 
 -- When writing your own functions, you can choose to give them an explicit type declaration. 
@@ -246,7 +246,7 @@ listCeption xxs = [ [ x | x <- xs, even x ] | xs <- xxs]
 removeNonUppercase' :: [Char] -> [Char]
 removeNonUppercase' st = [ c | c <- st, c `elem` ['A'..'Z']]
 
--- Specifying a fuction that takes several paramaters (It is actually partial application, but that is explained later on):
+-- Specifying a function that takes several paramaters (It is actually partial application, but that is explained later on):
 addThree :: Int -> Int -> Int -> Int
 addThree x y z = x + y + z
 
@@ -271,7 +271,7 @@ addThree x y z = x + y + z
 -- [Type variables]
 -- Type variables allow functions to operate on values of various types in a type-safe manner.
 -- They show up in type declarations as lowercase letters.
--- Functions that use type variables are called polymorphic functions. 
+-- Functions that use type variables are called polymorphic functions. A bit like generics in C#.
 
 -- > :t fst
 -- = fst :: (a, b) -> a
@@ -305,10 +305,10 @@ addThree x y z = x + y + z
 -- = True
 
 -- [The Ord type class]
--- Ord is a type class for types whose values van be put in some order.
+-- Ord is a type class for types whose values can be put in some order.
 -- Ord covers all the standard comparison functions such as (>), (<), (>=), (<=)
 -- The compare function takes two values whose type is an Ord instance and returns an Ordering.
--- Ordering is a type can can be GT, LT, or EQ. (Greater than, lesser than or equal).
+-- Ordering is a type that can be GT, LT, or EQ. (Greater than, lesser than or equal).
 -- > "Kaasbroodje" < "Bier"
 -- = False
 -- > "Kaasbroodje" `compare` "Bier"
@@ -377,6 +377,21 @@ addThree x y z = x + y + z
 -- To get around this, we can use fromIntegral:
 -- > fromIntegral (length([1,2,3,4]) + 3.2)
 -- = 7.2
+
+-- [Chapter 3 : Syntax in functions]
+-- [Pattern matching]
+-- Pattern matchin is used to specify patterns to which some data should conform and to deconstruct the data according to
+-- those patterns. 
+-- When defining functions in Haskell, you can create seperate function bodies for different patterns.
+
+-- Example
+lucky :: Int -> String
+lucky 7 = "Lucky number seven"
+lucky x = "Sorry, no luck for you"
+-- > lucky 7
+-- = "Lucky number seven"
+-- When you call lucky, the pattern is checked from top to bottom. The function conforms to the first pattern only if the function
+-- is called with 7. In any other case the value "falls through" the patterns and here the second pattern catches that value.
 
 
 
