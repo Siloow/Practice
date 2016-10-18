@@ -167,7 +167,7 @@ isL1biggerThanL2' = [1,2,1] > [2,1,0]
 -- = [2,4,6,8,10,12,14,16,18,20]
 -- In this list comprehension we say that we draw our elements from the list [1..10]
 -- [x <- [1..10]] means that x takes on the value of each element that is drawn frow [1..10]
--- In other words, we bind each element fom [1..10] to x. The part before the (|) is the output of the list comprehension.
+-- In other words, we bind each element fom [1..10] to x. The part before the (|) is the output of the list comprehension. [REREAD]
 
 -- It is also possible to add a predicate to the list comprehension
 -- > [x*2 | x <- [1..10], x*2 >= 12]
@@ -393,6 +393,86 @@ lucky x = "Sorry, no luck for you"
 -- When you call lucky, the pattern is checked from top to bottom. The function conforms to the first pattern only if the function
 -- is called with 7. In any other case the value "falls through" the patterns and here the second pattern catches that value.
 
+-- Make sure when you define a function with pattern matching that is should always include a catchall pattern. This way the program
+-- doesn't crash when it receives unexpected input.
+-- The exception that points you out to this fenomenon: Non-exhaustive patterns in function 'fuctionname'
+
+-- [Pattern matching with tuples]
+-- Example
+-- The following is a function that adds to 2D vectors together. First without pattern matching
+addVectors :: (Double, Double) -> (Double, Double) -> (Double, Double)
+addVectors a b = (fst a + fst b, snd a + snd b)
+
+-- Now with pattern matching
+addVectors' :: (Double, Double) -> (Double, Double) -> (Double, Double)
+addVectors' (x1, y1) (x2, y2) = (x1 + y1, x2 + y2)
+-- This function makes clear that it takes tuples as paramaters and it also increases readability by giving names to the type 
+
+-- [Pattern matching with lists and list comprehensions]
+-- To use pattern matching in list comprehensions:
+-- > let xs = [(1,3), (4,3), (2,4), (5,3), (5,6), (3,1)]
+-- > [a + b | (a,b) <- xs]
+-- = [4,7,6,8,11,4]
+-- If the pattern match fails, the list comprehension will just move on to the next element, and the element that failed won't be
+-- included in the resulting list.
+ 
+-- Regular lists can also be used in pattern matching. You can match with the empty list [] or any pattern that involves the : and the empty list.
+-- A pattern like x:xs will bind the head of the list to x and the rest of it to xs. If the list has only one single element (empty) then 
+-- x will be empty.
+
+-- The x:xs pattern is often used with recursive functions. However, patterns that include the : character will match only
+-- against lists of length one or more.
+
+-- Example
+head' :: [a] -> a
+head' [] = error "empty list"
+head' (x:_) = x
+-- We must surround the bounding variables in parentheses so Haskell can properly parse them.
+-- The error function here results in a runtime error.
+
+-- Example
+tell :: (Show a) => [a] -> String  
+tell [] = "The list is empty"  
+tell (x:[]) = "The list has one element: " ++ show x  
+tell (x:y:[]) = "The list has two elements: " ++ show x ++ " and " ++ show y  
+tell (x:y:_) = "This list is long. The first two elements are: " ++ show x ++ " and " ++ show y
+-- In this function (x:[]) and (x:y:[]) could be rewritten as [x] and [x,y]. However, we can't write (x:y:_) using square brackets,
+-- because it matches any list of length 2 or more. 
+
+-- Example
+-- Writing the length function with pattern matching
+length'' :: (Num b) => [a] -> b
+length'' [] = 0
+length'' (_:xs) = 1 + length'' xs
+-- > length'' "Ham"
+-- = 3
+-- The way this recursive function works:
+-- First: we check if it's and empty list. In this case it isn't so is falls through to the second pattern.
+-- This pattern matches, so it says : 1 + length'' "am", because we broke it into a head and a tail and discarded the head.
+-- The next call of length is : 1 + length'' "m", so we have 1 + (1 + length'' "m").
+-- The next step is 1 + length'' "", or 1 + length'' []. This matches the first case and thus = 0.
+-- This results in 1 + (1 + (1 + 0))
+
+-- Example
+-- sum
+-- We know wthat the sum of an empty list is 0, so we write that down as a pattern. The same counts for the multiplying. 
+-- In the case of multiplying the base case is 1. 
+sum' :: (Num a) => [a] -> a
+sum' [] = 0
+sum' (x:xs) = x + sum' xs 
+
+-- Note: you can't use the (++) operator in pattern matching. If you tried to pattern match (xs ++ ys), Haskell wouldn't
+-- be able to tell what would be in the xs list and what would be in the ys list. 
+
+-- [As patterns]
+-- As-patterns allow you to break up an item according to a pattern and binding it to names whilst keeping a reference to the original item.
+-- To create an as-patterns, precede a regular pattern with a name and an @ character. 
+-- Example
+firstLetter :: String -> String  
+firstLetter "" = "Empty string, whoops!"  
+firstLetter all@(x:xs) = "The first letter of " ++ all ++ " is " ++ [x]
+-- > firstLetter "Kaas"
+-- = "The first letter of Kaas is K"
 
 
 -- [Chapter 12 : Monoids]
