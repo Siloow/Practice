@@ -246,7 +246,7 @@ listCeption xxs = [ [ x | x <- xs, even x ] | xs <- xxs]
 removeNonUppercase' :: [Char] -> [Char]
 removeNonUppercase' st = [ c | c <- st, c `elem` ['A'..'Z']]
 
--- Specifying a function that takes several paramaters (It is actually partial application, but that is explained later on):
+-- Specifying a function that takes several paramaters (It is actually currying, but that is explained later on):
 addThree :: Int -> Int -> Int -> Int
 addThree x y z = x + y + z
 
@@ -473,6 +473,132 @@ firstLetter "" = "Empty string, whoops!"
 firstLetter all@(x:xs) = "The first letter of " ++ all ++ " is " ++ [x]
 -- > firstLetter "Kaas"
 -- = "The first letter of Kaas is K"
+
+-- [Guards]
+-- Guards are a bit like if's but way more readable inside a pattern match.
+
+-- Example
+bmiTell :: (RealFloat a) => a -> String
+bmiTell bmi
+    | bmi <= 18.5 = "You're underweight, you emo, you!" 
+    | bmi <= 25.0 = "You're supposedly normal. Pffft, I bet you're ugly!"  
+    | bmi <= 30.0 = "You're fat! Lose some weight, fatty!"  
+    | otherwise   = "You're a whale, congratulations!" 
+
+-- The function above modified so that it works with functions inside the guards :
+bmiTell' :: (RealFloat a) => a -> a -> String  
+bmiTell' weight height  
+    | weight / height ^ 2 <= 18.5 = "You're underweight, you emo, you!"  
+    | weight / height ^ 2 <= 25.0 = "You're supposedly normal. Pffft, I bet you're ugly!"  
+    | weight / height ^ 2 <= 30.0 = "You're fat! Lose some weight, fatty!"  
+    | otherwise                   = "You're a whale, congratulations!" 
+
+-- Note: There is no = after the function name and its paramaters, before the first guard.
+-- If there is, you get a syntax error. 
+
+-- Example
+-- Our own max function
+max' :: (Ord a) => a -> a -> a
+max' a b
+    | a <= b    = b
+    | otherwise = a
+
+-- Example
+-- Our own compare function (The function returns an ordering because the type class Ord always returns an ordering : LT, GT, EQ)
+myCompare :: (Ord a) => a -> a -> Ordering
+myCompare a b
+    | a > b     = GT
+    | a == b    = EQ
+    | otherwise = LT
+
+-- Note : Not only can we call functions as infix with backticks, we can also define them using backticks. Sometimes it's easier to read that way.
+
+-- [Where]
+-- The 'where' keyword lets you store the result of intermediate computations.
+-- We could use this mechanism in the previous example
+
+bmiTell'' :: (RealFloat a) => a -> a -> String  
+bmiTell'' weight height  
+    | bmi <= 18.5 = "You're underweight, you emo, you!"  
+    | bmi <= 25.0 = "You're supposedly normal. Pffft, I bet you're ugly!"  
+    | bmi <= 30.0 = "You're fat! Lose some weight, fatty!"  
+    | otherwise   = "You're a whale, congratulations!"  
+    where bmi = weight / height ^ 2
+-- Here 'bmi' is visible to all guards, but not outside the function ofcourse.
+
+-- [Pattern matching with where]
+-- Example
+initials :: String -> String -> String
+initials firstname lastname = [f] ++ ". " ++ [l] ++ "."
+    where   (f:_) = firstname
+            (l:_) = lastname
+-- Here we could have used pattern matching directly in the function's paramaters, but this is just as an example.
+
+-- [Functions in where blocks]
+-- Instead of a constant we can also use functions inside the where blocks
+-- Example
+calcBmis :: [(Double, Double)] -> [Double]
+calcBmis xs = [bmi w h | (w, h) <- xs]
+    where bmi weight height = weight / height ^ 2
+-- In this function we can't calculate the BMI from just the function's paramaters, so we have to introduce the 'bmi' function in the where block.
+-- We have to examine the list passed to the function and there's a different BMI for every pair in there.
+
+-- [let keyword]
+-- let expressions are similar to where bindings. where allows you to bind to variables at the end of a function, and those variables
+-- are visible to the entire function, including all its guards. let expressions, on the other hand, allow you to bind to variables anywhere
+-- and are expressions themselves.
+-- let's are very local, so they don't span across guards.
+-- let's can be used in pattern matching.
+-- Example
+cylinder :: (RealFloat a) => a -> a -> a
+cylinder r h =
+    let sideArea = 2 * pi * r * h
+        topArea = pi * r ^2
+    in  sideArea + 2 * topArea
+-- let expressions take the form of let <bindings> in <expression>. The names that you define in the let part are accessible to the expression after the in part.
+-- The difference between 'let' and 'where' is that let bindings are expressions themselves. where bindings are just syntactic constructs. If something is an
+-- expression, then it has a value. This means you can use let expressions almost anywhere.
+
+-- Examples
+-- > 4 * (let a = 9 in a + 1) + 2
+-- = 42
+
+-- They can also be used to introduce functions in a local scope:
+-- > [let square x = x * x in (square 5, square 3, square 2)]
+
+-- They can be seperated with semicolons, which is helpful when you want to bind several variables inline and can't align them in columns.
+-- > (let a = 100; b = 200; c = 300 in a*b*c, let foo="Hey "; bar = "there!" in foo ++ bar)
+-- = (6000000,"Hey there!") 
+
+-- Pattern matching with let expressions can be very useful for quickly dismantling a tuple into components and binding those components to names, like this:
+-- > (let (a, b, c) = (1, 2, 3) in a+b+c) * 300
+-- = 600
+-- In this function we use a let expression with a pattern match to deconstruct the triple (1, 2, 3). We call its first component a, its second component b,
+-- and its third component c. The in a+b+c part says that the whole let expression will have the value of a+b+c. Finally, we multiply that value by 100.
+
+-- let expressions can't be used across guards because they are expressions and have fairly local scope. Also 'where' is defined bindings are defined after
+-- the function they're being used in. This allows the function body to be closer to its name and type declaration, which makes code more readable.
+
+-- [let in list comprehensions]
+-- If we rewrite our previous example with a let expression inside a list comprehension instead of a where:
+calcBmis' :: (RealFloat a) => [(a, a)] -> [a]
+calcBmis' xs = [bmi | (w, h) <- xs, let bmi = w / h ^ 2]
+-- Here each time the list comprehension takes a tuple from the original list and binds its components to w and h, the let expression
+-- binds w / h ^ 2 to the name bmi. Then we just present bmi as the output of the list comprehension.
+
+-- We include a let inside a list comprehension much as we would use a predicate, but instead of filtering the list,
+-- it only binds values to names. The names defined in this let are visible to the output (the part before the |), and everything in this list comprehension
+-- that comes after the let. So we could make this function only return less skinny people:
+calcBmis'' :: (RealFloat a) => [(a, a)] -> [a]  
+calcBmis'' xs = [bmi | (w, h) <- xs, let bmi = w / h ^ 2, bmi >= 25.0] 
+-- The predicate is added after the let expression.
+-- the (w, h) <- xs part of the list comprehension is called the generator.
+-- We can't use the bmi name in the (w, h) <- xs part because it's defined prior to the let binding.
+
+-- [let in GHCi]
+-- ...
+
+
 
 
 -- [Chapter 12 : Monoids]
