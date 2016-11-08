@@ -8,6 +8,9 @@
 -- Search for [REREAD] every time you open the file. This are parts that you didn't really understand yet. 
 -- Have fun
 
+-- This is not my code. It's all from http://learnyouahaskell.com/ and the paperback version. This is just me learning Haskell by 
+-- trying out every example and writing down things I later on want to be able to refer back to in one file.
+
 
 -- Dictionary
 -- Statement : defines an action, consists of expressions (What code does) Ex. (print y)
@@ -262,7 +265,7 @@ addThree x y z = x + y + z
 -- Bool
 -- -- A boolean type. Holds the value True or False.
 -- Char
--- -- Represenets Unicode characters. Denoted with single qoutes.
+-- -- Represents Unicode characters. Denoted with single qoutes.
 -- Tuples
 -- -- Are types, which depends on their length and the type of its component(s). 
 -- -- Can have at max 62 elements.
@@ -377,6 +380,8 @@ addThree x y z = x + y + z
 -- To get around this, we can use fromIntegral:
 -- > fromIntegral (length([1,2,3,4]) + 3.2)
 -- = 7.2
+
+-- [END CHAPTER2]
 
 -- [Chapter 3 : Syntax in functions]
 -- [Pattern matching]
@@ -596,9 +601,39 @@ calcBmis'' xs = [bmi | (w, h) <- xs, let bmi = w / h ^ 2, bmi >= 25.0]
 -- We can't use the bmi name in the (w, h) <- xs part because it's defined prior to the let binding.
 
 -- [let in GHCi]
--- ...
+-- The 'in' part of the binding can also be omitted when defining functions and constants directly in GHCi. If we do that, then the names
+-- will be visible throughout the entire interactive session:
+-- > let zoot x y z = x * y + z
+-- > zoot 3 9 2
+-- = 29
+-- > let boot x y z = x * y + z in boot 3 4 2
+-- = 14
+-- > boot
+-- = <interactive>:14:1: error: Variable not in scope: boot
+-- Because we omitted the 'in' part in our first line, GHCi knows we're only using zoot in that line, so it remembers it for the rest of the session.
+-- However, in the second let expression, we included the in part and called boot immediately with some paramaters. A let expression that doesn't leave
+-- out the in part is an expression in itself and represents a value, so GHCi just printed the value. 
 
+-- [case expressions]
+-- case expressions allow you to execute blocks of code for specific values of a particular variable.
+-- [REREAD] Summerize this bit later. Just use pattern matching for now (or forever).
 
+-- [END CHAPTER3]
+
+-- [Chapter 4 : Recursion]
+-- A recursive function is a function that calls itself. The strategy of such a function is to break down the problem at hand into
+-- smaller problems of the same kind and then try to solve those subproblems, breaking them down further if neccessary.
+-- Eventually we reach the base case of the problem, which can't be broken down any more and whose solutions need to be explicitly
+-- defined by the programmer.
+
+-- Examples
+maximum' :: (Ord a) => [a] -> a
+maximum' [] = error "maximum of empty list"
+maximum' [x] = x
+maximum' (x:xs)
+    | x > maxTail = x
+    | otherwise = maxTail
+    where maxTail = maximum' xs
 
 
 -- [Chapter 12 : Monoids]
