@@ -1,18 +1,18 @@
 -- For future self:
 -- This is a summary of Learn you a Haskell for a great good.
 -- You went through every chapter and wrote down the most important stuff.
--- If you encounter "-- >" it means you can test it out in WinGHci or something.
+-- If you encounter "-- >" it means you can test it out in the GHci.
 -- If you encounter "-- =" it means the result of the "-- >" above.
 -- [Some kind of title] means a new paragraph or chapter.
--- Each chapter can be uncommeneted seperately so that the examples do interfere with eachother.
--- Search for [REREAD] every time you open the file. This are parts that you didn't really understand yet. 
+-- Each chapter can be uncommeneted seperately so that the examples do not interfere with eachother.
+-- Search for [REREAD] every time you open the file. This are parts that you do not yet understand. 
 -- Have fun
 
 -- This is not my code. It's all from http://learnyouahaskell.com/ and the paperback version. This is just me learning Haskell by 
 -- trying out every example and writing down things I later on want to be able to refer back to in one file.
 
 
--- Dictionary
+-- [Personal Dictionary]
 -- Statement : defines an action, consists of expressions (What code does) Ex. (print y)
 -- Expression : A collection of symbols that jointly express a quantity. It evaluates to a value. (What code is) Ex. (y = x + 1)
 -- 'Let' keyword : Used to define a name (and more..)
@@ -549,7 +549,7 @@ calcBmis xs = [bmi w h | (w, h) <- xs]
 -- We have to examine the list passed to the function and there's a different BMI for every pair in there.
 
 -- [let keyword]
--- let expressions are similar to where bindings. where allows you to bind to variables at the end of a function, and those variables
+-- let bindings are similar to where bindings. where allows you to bind to variables at the end of a function, and those variables
 -- are visible to the entire function, including all its guards. let expressions, on the other hand, allow you to bind to variables anywhere
 -- and are expressions themselves.
 -- let's are very local, so they don't span across guards.
@@ -625,6 +625,7 @@ calcBmis'' xs = [bmi | (w, h) <- xs, let bmi = w / h ^ 2, bmi >= 25.0]
 -- smaller problems of the same kind and then try to solve those subproblems, breaking them down further if neccessary.
 -- Eventually we reach the base case of the problem, which can't be broken down any more and whose solutions need to be explicitly
 -- defined by the programmer.
+-- In Haskell you do computations by declaring what something is rather than specifying how you compute it.
 
 -- Examples
 maximum' :: (Ord a) => [a] -> a
@@ -635,13 +636,55 @@ maximum' (x:xs)
     | otherwise = maxTail
     where maxTail = maximum' xs
 
+replicate' :: (Num i, Ord i) => i -> a -> [a]
+replicate' n x
+    | n <= 0    = []
+    | otherwise = x : replicate' (n-1) x 
 
--- [Chapter 12 : Monoids]
+-- The take function returns a specified number of elements from a specified list.
+-- In this function we use a guard without a 'otherwise' part in the second pattern. This means that if n turns out to be more than 0, the
+-- matching will fall through to the next pattern.
+take' :: (Num i, Ord i) => i -> [a] -> [a]
+take' n _
+    | n <= 0    = []
+take' _ []      = []
+take' n (x:xs) = x : take' (n-1) xs
 
--- List type as applicative functor
--- <*> takes every function out of the list that is its left parameter and applies it to every value in that list that is on the right.
--- This results in every possible combination of applying a function from the left list to a value in the right list:
--- Example:
--- ghci> [(+1), (*100), (*5)] <*> [1,2,3]
--- [2,3,4,100,200,300,5,10,15]
+reverse' :: [a] -> [a]
+reverse' [] = []
+reverse' (x:xs) = reverse' xs ++ [x]
+
+-- The function repeat will keep repeating a certain value, so you have to call 'take 5 (repeat 3)'
+-- Essentially, it's like calling replicate 5 3
+repeat' :: a -> [a]
+repeat' x = x:repeat' x
+
+-- Zip takes two lists and zips them together. For instance, calling zip [1,2,3] [7,8] return [(1,7),(2,8)]
+-- The function truncates the longer list to match the length of the shorter one
+-- The third pattern says that zipping two lists together is equivalent to pairing up their heads, then appending their zipped tails to that.
+zip' :: [a] -> [b] -> [(a,b)]
+zip' _ [] = []
+zip' [] _ = []
+zip' (x:xs) (y:ys) = (x,y):zip' xs ys
+
+elem' :: (Eq a) => a -> [a] -> Bool
+elem' a [] = False
+elem' a (x:xs)
+    | a == x = True
+    | otherwise = a `elem` xs
+
+-- Quick sort implementation
+-- We put all the elements less than or equal to x (our pivot) to its left. To retrieve those elements, we use the list comprehension 
+-- [a | a <- xs, a <= x]. This list comprehension will draw from xs and keep only those that satisfy the condition a <= x.
+-- We use let bindings to give two lists handy names : smallerSorted and biggerSorted.
+-- Finally, we use the list concatenation operator (++) and a recursive application of our quicksort function to express
+-- that we want our final list to be made of a sorted smallerSorted list, then the pivot x, followed by the biggerSorted list.
+quicksort :: (Ord a) => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) =
+    let smallerSorted = quicksort [a | a <- xs, a <= x]
+        biggerSorted = quicksort [a | a <- xs, a > x]
+    in  smallerSorted ++ [x] ++ biggerSorted
+
+-- [END CHAPTER4]
 
