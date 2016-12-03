@@ -17,12 +17,13 @@
 -- Expression : A collection of symbols that jointly express a quantity. It evaluates to a value. (What code is) Ex. (y = x + 1)
 -- 'Let' keyword : Used to define a name (and more..)
 -- Predicate : condition
+-- '->' is naturally right-associative
 
 -- [Chapter 1 : Introduction]
 -- [Calling functions]
 
 -- (*) is called an infix function.
--- With prefix functions the name comes first, then a space then its paramaters.
+-- With prefix functions the name comes first, then a space then its parameters.
 -- Function application hsa the highest precedence of all the operations in Haskell.
 
 -- By using backticks, we can call a prefix function as an infix function.
@@ -39,7 +40,7 @@ doubleUs x y = x * 2 + y * 2
 -- Functions in Haskell don't have to be defined in any particular order, so it doesn't matter which function comes first in a file.
 -- Functions can't begin with a capital letter
 
--- The following is not a 'function' because it doens't take any paramaters. It is a 'definition' or a 'name'
+-- The following is not a 'function' because it doens't take any parameters. It is a 'definition' or a 'name'
 myNameIsSil = "I love cheese"
 
 -- Functions can also call eachother.
@@ -187,7 +188,7 @@ multiValueListResult = [x+y | x <- [1,2,3], y <- [10,100,1000]]
 -- = [11,101,1001,12,102,1002,13,103,1003]
 -- x is draw from [1,2,3] and y is drawn from [10,100,1000]. While x is 1, y takes on every value from [10,100,1000]
 -- and adds 1 to every element that y becomes.
--- To use this function with paramaters rewrite it like this:
+-- To use this function with parameters rewrite it like this:
 multiValueListResult' xs ys = [x+y | x <- xs, y <- ys]
 
 -- Another example 
@@ -249,7 +250,7 @@ listCeption xxs = [ [ x | x <- xs, even x ] | xs <- xxs]
 removeNonUppercase' :: [Char] -> [Char]
 removeNonUppercase' st = [ c | c <- st, c `elem` ['A'..'Z']]
 
--- Specifying a function that takes several paramaters (It is actually currying, but that is explained later on):
+-- Specifying a function that takes several parameters (It is actually currying, but that is explained later on):
 addThree :: Int -> Int -> Int -> Int
 addThree x y z = x + y + z
 
@@ -411,7 +412,7 @@ addVectors a b = (fst a + fst b, snd a + snd b)
 -- Now with pattern matching
 addVectors' :: (Double, Double) -> (Double, Double) -> (Double, Double)
 addVectors' (x1, y1) (x2, y2) = (x1 + y1, x2 + y2)
--- This function makes clear that it takes tuples as paramaters and it also increases readability by giving names to the type 
+-- This function makes clear that it takes tuples as parameters and it also increases readability by giving names to the type 
 
 -- [Pattern matching with lists and list comprehensions]
 -- To use pattern matching in list comprehensions:
@@ -498,7 +499,7 @@ bmiTell' weight height
     | weight / height ^ 2 <= 30.0 = "You're fat! Lose some weight, fatty!"  
     | otherwise                   = "You're a whale, congratulations!" 
 
--- Note: There is no = after the function name and its paramaters, before the first guard.
+-- Note: There is no = after the function name and its parameters, before the first guard.
 -- If there is, you get a syntax error. 
 
 -- Example
@@ -537,7 +538,7 @@ initials :: String -> String -> String
 initials firstname lastname = [f] ++ ". " ++ [l] ++ "."
     where   (f:_) = firstname
             (l:_) = lastname
--- Here we could have used pattern matching directly in the function's paramaters, but this is just as an example.
+-- Here we could have used pattern matching directly in the function's parameters, but this is just as an example.
 
 -- [Functions in where blocks]
 -- Instead of a constant we can also use functions inside the where blocks
@@ -545,7 +546,7 @@ initials firstname lastname = [f] ++ ". " ++ [l] ++ "."
 calcBmis :: [(Double, Double)] -> [Double]
 calcBmis xs = [bmi w h | (w, h) <- xs]
     where bmi weight height = weight / height ^ 2
--- In this function we can't calculate the BMI from just the function's paramaters, so we have to introduce the 'bmi' function in the where block.
+-- In this function we can't calculate the BMI from just the function's parameters, so we have to introduce the 'bmi' function in the where block.
 -- We have to examine the list passed to the function and there's a different BMI for every pair in there.
 
 -- [let keyword]
@@ -611,7 +612,7 @@ calcBmis'' xs = [bmi | (w, h) <- xs, let bmi = w / h ^ 2, bmi >= 25.0]
 -- > boot
 -- = <interactive>:14:1: error: Variable not in scope: boot
 -- Because we omitted the 'in' part in our first line, GHCi knows we're only using zoot in that line, so it remembers it for the rest of the session.
--- However, in the second let expression, we included the in part and called boot immediately with some paramaters. A let expression that doesn't leave
+-- However, in the second let expression, we included the in part and called boot immediately with some parameters. A let expression that doesn't leave
 -- out the in part is an expression in itself and represents a value, so GHCi just printed the value. 
 
 -- [case expressions]
@@ -688,3 +689,48 @@ quicksort (x:xs) =
 
 -- [END CHAPTER4]
 
+-- [CHAPTER 5 : Higher-order functions]
+-- A function that returns a function is called a higher-order function.
+
+
+-- [Currying]
+-- Every function in Haskell takes only one parameter. All functions that "take multiple parameters" are curried functions.
+-- A curried function is a function that, instead of taking several parameter, always takes exactly one parameter. Then when it's
+-- called with that parameter, it returns a function that takes the next parameter, and so on.
+-- > :t max
+-- = max :: (Ord a) => a -> a -> a
+-- This can also be written as follows:
+-- > max :: (Ord a) => a -> (a -> a)
+
+-- When we have something like a -> (a-> a), we're dealing with a function that takes a value of tpe a, and it returns a function that
+-- also takes a value of type a and returns a value of type a
+-- The benefit of this is, if we call a function with too few parameters, we get back a partially applied function, which is a function
+-- that takes as many parameters as we left out.
+
+-- Example
+multThree :: (Num a) => a -> a -> a -> a
+multThree x y z = x * y * z
+-- What really happens here is : ((multThree 3) 5) 9
+-- The function's type can also be written as:
+-- > multThree :: Int -> (Int -> (Int -> Int))
+-- The type variable before the -> is the type of the values that the function takes, and the type after it is the type of values it returns
+
+-- [Sections]
+-- Infix functions can also be partially applied by using sections.
+-- To section an infix function, simply surround it with parentheses and supply a parameter on only one side.
+divideByTen :: (Floating a) => a -> a
+divideByTen = (/10)
+-- This returns a function that takes one parameter and then aplliesd it to the side that's missing an operand.
+-- If you want to use (-10), use (subtract 10) instead.
+
+-- You can't call functions in the GHCi that are not part of the Show type class.
+
+-- [Some more Higher-Orderism]
+-- Demo of functions returning funcions
+applyTwice :: (a -> a) -> a -> a
+applyTwice f x = f (f x)
+-- Here the parentheses are mandatory; they indicate that the first parameter is a function that takes one parameter and returns a value of
+-- the same type (a -> a). The second parameter is something of type a, and the return value's type is also a.
+
+-- > applyTwice (+3) 10
+-- = 16
