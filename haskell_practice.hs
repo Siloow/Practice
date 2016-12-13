@@ -692,7 +692,6 @@ quicksort (x:xs) =
 -- [CHAPTER 5 : Higher-order functions]
 -- A function that returns a function is called a higher-order function.
 
-
 -- [Currying]
 -- Every function in Haskell takes only one parameter. All functions that "take multiple parameters" are curried functions.
 -- A curried function is a function that, instead of taking several parameter, always takes exactly one parameter. Then when it's
@@ -702,8 +701,8 @@ quicksort (x:xs) =
 -- This can also be written as follows:
 -- > max :: (Ord a) => a -> (a -> a)
 
--- When we have something like a -> (a-> a), we're dealing with a function that takes a value of tpe a, and it returns a function that
--- also takes a value of type a and returns a value of type a
+-- When we have something like a -> (a-> a), we're dealing with a function that takes a value of type a, and it returns a function that
+-- also takes a value of type a and returns a value of type a.
 -- The benefit of this is, if we call a function with too few parameters, we get back a partially applied function, which is a function
 -- that takes as many parameters as we left out.
 
@@ -734,3 +733,63 @@ applyTwice f x = f (f x)
 
 -- > applyTwice (+3) 10
 -- = 16
+-- > applyTwice (++ " HAHA") "HEY"
+-- = "HEY HAHA HAHA"
+-- > applyTwice ("HAHA " ++) "HEY"
+-- = "HAHA HAHA HEY"
+
+-- [Implementing zipWith]
+-- This function's first parameter takes two arguments and returns one value. The second and third parameters are lists and the final return
+-- is also a list.
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith' _ [] _ = []
+zipWith' _ _ [] = []
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+
+-- > zipWith' (+) [4,3,5,6] [2,6,2,3]
+-- = [6,8,7,9]
+-- > zipWith' (zipWith' (*)) [[1,2,3],[3,5,6],[2,3,4]] [[3,2,2],[3,4,5],[5,4,3]]
+-- = [[3,4,6],[9,20,30],[10,12,12]]
+
+-- [Implementing flip]
+-- This function takes a function and returns a function that has its arguments flipped.
+flip' :: (a -> b -> c) -> (b -> a -> c)
+flip' f = g
+    where g x y = f y x
+-- Or even simpler:
+-- We can omit the parentheses because functions are curried by default.
+flip'' :: (a -> b -> c) -> b -> a -> c
+flip'' f y x = f x y
+
+-- [The functional programmer's toolbox]
+-- [The map function]
+-- The map function takes a function and a list, and apllies that function to every element in the list, producing a new list.
+-- Definition:
+-- map :: (a -> b) -> [a] -> [b]
+-- map _ [] = []
+-- map f (x:xs) = f x : map f xs
+
+-- Example:
+-- > map (+3) [1,5,3,1,6]
+-- = [3,8,6,4,9]
+-- This example can also be written with a list comprehension like:
+-- [x+3 | x <- [1,5,3,1,6]]
+
+-- [The filter function]
+-- This function takes a predicate and a list, and returns the list of elements that satisfy that predicate (a new list).
+-- Definition:
+-- filter :: (a -> Bool) -> [a] -> [a]
+-- filter _ [] = []
+-- filter p (x:xs)
+--     | p x   = x : filter p xs
+--     | otherwise = filter p xs
+
+-- Example:
+-- > filter even [1..10]
+-- = [2,4,6,8,10]
+
+-- > filter (<15) (filter even [1..20])
+-- = [2,4,6,8,10,12,14]
+-- Can also be written with a list comprehension
+-- > [x | x <- [1..20], x < 15, even x]
+-- = [2,4,6,8,10,12,14]
