@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\title{My first document}
+\date{25-12-2016}
+\author{Sil de Graaf}
+
+\begin{document}
+	\tableofcontents
+	\newpage
+
+	\pagenumbering{gobble}
+	\maketitle
+	\newpage
+	\pagenumbering{arabic}
+
+	\section{First section}
+	Hello World!
+
+	\subsection{Subsection}
+	
+	Hello Mars!
+
+	\subsubsection{Subsubsection about math}
+		\begin{equation}
+			f(x) = x^5
+		\end{equation}
+		But now we encounter some text and we shall use this formula $f(x) = x + 5 - 6^5$ as an example.
+
+		We shall now try to use the amsmath package
+
+		\begin{equation*}
+			1 + 2 = 3
+		\end{equation*}
+
+		\begin{equation*}
+			1 = 5 - x
+		\end{equation*}
+
+		\begin{align*}
+			1 + 2  = & 3 \\
+			1 & = 5 - x
+		\end{align*}
+
+		\begin{align*}
+			f(x) &= x^2\\
+			g(x) &= \frac{1}{x}\\
+			F(x) &= \int^a_b \frac{1}{3}x^3
+		\end{align*} 
+
+	\paragraph{Dis a paragraph}
+
+	\section{Second section}
+\end{document}
