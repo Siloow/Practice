@@ -24,7 +24,7 @@
 
 -- (*) is called an infix function.
 -- With prefix functions the name comes first, then a space then its parameters.
--- Function application hsa the highest precedence of all the operations in Haskell.
+-- Function application has the highest precedence of all the operations in Haskell.
 
 -- By using backticks, we can call a prefix function as an infix function.
 -- > 92 `div` 10
@@ -295,7 +295,7 @@ addThree x y z = x + y + z
 -- The equality operator (==) is actually a function. If a function is composed of only special characters, it's considered an
 -- infix function by default. To examine its type, pass it to another function, or call it as a prefix function, we need to surround
 -- it in parentheses. 
--- Everything before the (==>) symbol is called a class constraint.
+-- Everything before the "=>" symbol is called a class constraint.
 -- This function is read as : The equality function takes any two values that are of the same type and return a Bool. The type of those two values
 -- must be an instance of the Eq class. 
 
@@ -793,3 +793,20 @@ flip'' f y x = f x y
 -- Can also be written with a list comprehension
 -- > [x | x <- [1..20], x < 15, even x]
 -- = [2,4,6,8,10,12,14]
+
+-- [Lambdas]
+-- Lambdas are anonymous functions that we use when we need a function only once. Normally, we make a lambda with the sole purpose of passing it to a higher-
+-- order function. 
+-- To declare a lambda, we write \, and then we write the function's parameters, seperated by spaces. 
+-- Lambdas are expressions, which is why we can just pass them to functions. Like normal functions, lambdas can take any number of parameters:
+-- > zipWith (\a b -> (a * 30 + 3) / b) [5,4,3,2,1] [1,2,3,4,5]
+-- = [153.0,61.5,31.0,15.75,6.6]
+-- And like normal functions, you can pattern match in lambdas. The only difference is that you can't define several patterns for one parameter.
+
+-- Example:
+-- These functions are equivalent.
+addThree' :: Int -> Int -> Int -> Int
+addThree' x y z = x + y + z
+
+addThree'' :: Int -> Int -> Int -> Int
+addThree'' = \x -> \y -> \z -> x + y + z
