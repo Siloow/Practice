@@ -932,3 +932,20 @@ andFold xs = foldr (&&) True xs
 -- Like we said, the $ function is right-associative, meaning that something like f $ g $ x is equivalent to f $ (g $ x).
 -- With that in mind we can rewrite the previous example again:
 -- > sum $ filter (> 10) $ map (*2) [2..10]
+
+-- [Function composition]
+-- Function composition is callong one function with some value and then calling another function with the result of the first function.
+-- Definition:
+-- (.) :: (b -> c) -> (a -> b) -> a -> c
+-- f . b = \x -> f (g x)
+
+-- One use for function composition is making functions on the fly to pass to other functions. 
+-- We can use lambdas for that, but function composition is often more concise.
+-- Example:
+-- > map (\x -> negate (abs x)) [5,-3,-6,7,-3,2,-19,24]
+-- = [-5,-3,-6,-7,-3,-2,-19,-24]
+-- Can be rewritten like :
+-- > map (negate . abs) [5,-3,-6,7,-3,2,-19,24]
+-- = [-5,-3,-6,-7,-3,-2,-19,-24]
+
+-- Function composition is right-associative. The expression f (g (z x)) is equivalent to (f . g . z) x.
