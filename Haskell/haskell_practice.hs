@@ -810,3 +810,94 @@ addThree' x y z = x + y + z
 
 addThree'' :: Int -> Int -> Int -> Int
 addThree'' = \x -> \y -> \z -> x + y + z
+
+-- [I Fold You So]
+-- Folds allow you to reduce a data structure to a single value.
+-- A fold takes a binary function (one that takes two parametersm such as + or div), a starting value (often called the accumulator), and a list to fold up.
+
+-- Example:
+-- Left fold with foldl: In this case, the binary function is applied between the starting accumulator and the head of the list. That produces a new
+-- accumulator value, and the binary function is called with that value and the next element, and so on.
+sumFold :: (Num a) => [a] -> a
+sumFold xs = foldl (\acc x -> acc + x) 0 xs
+-- Here \acc x -> acc + x is the binary function. 0 is the starting value, and xs is the list to be folded.
+-- The function can also be written like so:
+sumFold' :: (Num a) => [a] -> a
+sumFold' = foldl (+) 0
+-- We can omit the xs as the parameter because calling "foldl (+) 0" will return a function that takes a list. This is because of currying.
+-- If you have a function like : foo a = bar b a , you can rewrite it as : foo = bar b.
+
+-- The right fold function, is similar to the left fold, except the accumulator eats up the values from the right.
+-- Also, the order of parameters in the right fold's binary function in reversed: the current list value is the first parameter,
+-- and the accumulator is the second.
+mapFold :: (a -> b) -> [a] -> [b]
+mapFold f xs = foldr (\x acc -> f x : acc) [] xs
+-- This function with a foldl:
+mapFold' :: (a -> b) -> [a] -> [b]
+mapFold' f xs = foldl (\acc x -> acc ++ [f x]) [] xs
+-- However, the ++ is slower than using the : operator, so we usually use right folds when we're building new lists.
+-- Foldr's work on infinite lists.
+
+-- Another example:
+-- The elem function
+elemFold :: (Eq a) => a -> [a] -> Bool
+elemFold y ys = foldr (\x acc -> if x == y then True else acc) False ys
+
+-- [foldr1, foldl1 and more examples]
+-- The foldr1 and foldl1 functions work much like the foldr and foldl, except that you don't need to provide them with an
+-- explicit starting accumulator. The function assumes the first element as the starting accumulator.
+-- These functions do cause an error if used on empty lists.
+
+maximumFold :: (Ord a) => [a] -> a
+maximumFold = foldr1 (\x acc -> if x > acc then x else acc)
+
+-- The difference between foldr and foldr1 :
+-- foldr :: (a -> b -> b) -> b -> t a -> b
+-- foldr1 :: (a -> a -> a) -> t a -> a
+
+-- More examples of fold:
+reverseFold :: [a] -> [a]
+reverseFold = foldl (\acc x -> x : acc) []
+-- This function can also be written like so:
+reverseFold' :: [a] -> [a]
+reverseFold' = foldl (flip (:)) []
+
+productFold :: (Num a) => [a] -> a
+productFold = foldr1 (*)
+
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' p = foldr (\x acc -> if p x then x : acc else acc) []
+
+headFold :: [a] -> a
+headFold = foldr1 (\x _ -> x)
+
+lastFold :: [a] -> a 
+lastFold = foldl1 (\_ x -> x)
+
+-- Another way to look at folds is as successive applications of some function elements in a list.
+-- A right fold, with a binary function f and a starting accumulator z, we're doing this:
+-- f 3(f 4(f 5(f 6 z)))
+-- If we take f to be + and the acc to be 0:
+-- 3 + (4 + (5 + (6 + 0)))
+-- Or as a prefix function:
+-- (+) 3 ((+) 4 ((+) 5 ((+) 6 0)))
+-- Doing a left fold over that list with g as the binary function and z as the acc:
+-- g (g (g (g z 3) 4) 5 ) 6
+-- If we take f to be flip and the acc to be []:
+-- flip (:) (flip (:) (flip (:) (flip (:) [] 3) 4) 5) 6
+
+-- the and function implemented as a foldr.
+andFold :: [Bool] -> Bool
+andFold xs = foldr (&&) True xs
+-- [True, False, True] will be evaluated like this:
+-- True && (False && (True && True))
+-- The last true is our starting accumulator.
+
+-- foldr will work on infinite lists when the binary function that we're passing to it doesn't always need to evaluate
+-- to its second parameter to give us some sort of answer. In the previous example, && doens't care what its second
+-- parameter is if its first parameter is False:
+-- (&&) :: Bool -> Bool -> Bool
+-- True && x = x
+-- False && _ = False
+
+-- [Scans]
