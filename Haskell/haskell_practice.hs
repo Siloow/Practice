@@ -901,3 +901,34 @@ andFold xs = foldr (&&) True xs
 -- False && _ = False
 
 -- [Scans]
+-- scanl and scanr are like foldl and foldr, except they report all the intermediate accumulator states in the form of a list.
+-- Examples:
+-- > scanl (+) 0 [3,5,2,1]
+-- = [0,3,8,10,11] 
+-- > scanr (+) 0 [3,5,2,1]
+-- = [11,8,3,1,0]
+-- > scanl (flip (:)) [] [3,2,1]
+-- = [[],[3],[2,3],[1,2,3]]
+-- When using a scanl, the final result will be in the last element of the resulting list. scanr will place the result
+-- in the head of the list.
+
+-- [Function application with $]
+-- The function application operator $ is defined like this:
+-- ($) :: (a -> b) -> a -> b
+-- f $ x = f x
+
+-- Normal function application has really high precedence, whereas the $ function has the lowest precedence.
+-- Function application with a space is left-associative (f a b c is the same as ((f a) b) c), while function application with
+-- $ is right-associative.
+-- This function is mostly used for convenience that lets us write fewer parentheses.
+-- When $ is encountered, the expression on its right is applied as the parameter to the function on its left.
+
+-- Example:
+-- > sum (filter (> 10) (map (*2) [2..10]))
+-- = 80
+-- We can use the $ function to rewrite our previous example:
+-- > sum $ filter (> 10) map (*2) [2..10])
+
+-- Like we said, the $ function is right-associative, meaning that something like f $ g $ x is equivalent to f $ (g $ x).
+-- With that in mind we can rewrite the previous example again:
+-- > sum $ filter (> 10) $ map (*2) [2..10]
