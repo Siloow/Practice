@@ -949,3 +949,16 @@ andFold xs = foldr (&&) True xs
 -- = [-5,-3,-6,-7,-3,-2,-19,-24]
 
 -- Function composition is right-associative. The expression f (g (z x)) is equivalent to (f . g . z) x.
+
+-- [Function composition with multiple parameters]
+-- If we want to use functions in composition we must partially apply them so that each function takes just one parameter.
+-- If we want to rewrite an expression with a lot of parentheses using function composition, we can start by first writing out the
+-- innermost function and its parameters. Then we put a $ before it and compose all the functions that came before by writing
+-- them without their last parameter and putting dots between them. 
+
+-- Example:
+-- > replicate 100 (product (map (*3) (zipWith max [1,2,3,4,5] [4,5,6,7,8])))
+-- Can be rewritten as follows:
+-- > replicate 100 . product . map (*3) . zipWith max [1,2,3,4,5] $ [4,5,6,7,8]
+
+-- [END CHAPTER 5]
