@@ -962,3 +962,24 @@ andFold xs = foldr (&&) True xs
 -- > replicate 100 . product . map (*3) . zipWith max [1,2,3,4,5] $ [4,5,6,7,8]
 
 -- [END CHAPTER 5]
+
+-- [CHAPTER 6 : Modules]
+-- A Haskell module is essentially a file that difines some functions, types and type classes. A Haskell program is a collection of modules.
+-- Some examples of solving problems with module functions:
+-- Saving this chapter for later.
+-- [END CHAPTER 6]
+
+-- [Making our own types and type classes]
+-- [Defining a new data type]
+-- One way to make our own type is to use the data keyword.
+-- > data Bool = False | True
+--  [ 1 ] [2 ]   [     3     ]
+-- [1] Using the data keyword like this means that a new data type is being defined.
+-- [2] Denotes the type
+-- [3] Value constructors. They specify the different values that this type can have.
+-- Value constructors are actually functions that ultimately return a value of a data type.
+-- Both the type name and the value constructors must start with an uppercase letter.
+
+-- [Shaping up]
+-- Let's say that a shape can be a circle or a rectangle. Here's one possible definition:
+-- > data Shape = Circle Float Float Float | Rectangle Float Float Float Float
