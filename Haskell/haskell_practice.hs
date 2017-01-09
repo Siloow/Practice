@@ -934,7 +934,7 @@ andFold xs = foldr (&&) True xs
 -- > sum $ filter (> 10) $ map (*2) [2..10]
 
 -- [Function composition]
--- Function composition is callong one function with some value and then calling another function with the result of the first function.
+-- Function composition is calling one function with some value and then calling another function with the result of the first function.
 -- Definition:
 -- (.) :: (b -> c) -> (a -> b) -> a -> c
 -- f . b = \x -> f (g x)
@@ -977,9 +977,53 @@ andFold xs = foldr (&&) True xs
 -- [1] Using the data keyword like this means that a new data type is being defined.
 -- [2] Denotes the type
 -- [3] Value constructors. They specify the different values that this type can have.
--- Value constructors are actually functions that ultimately return a value of a data type.
 -- Both the type name and the value constructors must start with an uppercase letter.
 
 -- [Shaping up]
 -- Let's say that a shape can be a circle or a rectangle. Here's one possible definition:
 -- > data Shape = Circle Float Float Float | Rectangle Float Float Float Float
+-- >    deriving (Show) -- This so that our function works in the prompt
+-- The Circle value construtor has three fields, which take floats. So when we write a value constructor, we can optionally add some
+-- types after it, and those types define the type of values it will contain. 
+-- Value constructors are actually functions that ultimately return a value of a data type.
+
+-- Example:
+-- > area :: Shape -> Float
+-- > area (Circle _ _ r) = pi * r ^ 2
+-- > area (Rectangle x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
+-- Here the type declaration is Shape -> Float and not Circle -> Float because Circle is not a type, while Shape is. 
+-- For the same reason you cannot say True -> Int.
+-- Notice we can pattern match against constructors. Here we write a constructor and then bind its fields to names. 
+
+-- Value constructors are functions, so we can map them, partially apply them etc. 
+-- > map (Circle 10 20) [4, 5, 6, 6]
+-- = [Circle 10.0 20.0 4.0,Circle 10.0 20.0 5.0,Circle 10.0 20.0 6.0,Circle 10.0 20.0 6.0]
+
+-- [Improving our Shape]
+-- We introduce a Point data type that makes shapes more understandable because it is now clear which part of the types in the 
+-- after the value constructors represent what kind of data.
+data Point = Point Float Float deriving (Show)
+data Shape = Circle Point Float | Rectangle Point Point deriving (Show)
+
+-- We need to add these Point value constructors in our function definiton:
+area :: Shape -> Float
+area (Circle _ r) = pi * r ^ 2
+area (Rectangle (Point x1 y1) (Point x2 y2)) = (abs $ x2 - x1) * (abs $ y2 - y1)
+
+-- Example of nudging a shape. (Moving it on the x and y axis.)
+nudge :: Shape -> Float -> Float -> Shape
+nudge (Circle (Point x y) r) a b = Circle (Point (x+a) (y+b)) r
+nudge (Rectangle (Point x1 y1) (Point x2 y2)) a b = Rectangle (Point (x1+a) (x2+b)) (Point (x2+a) (y2+b))
+
+-- Here we define a function that takes a radius and makes a circle that is located at the origin of the coordinate system, with
+-- the radius we supplied:
+baseCircle :: Float -> Shape
+baseCircle r = Circle (Point 0 0 ) r
+
+-- The same for the rectangle, but with the bottom-left corner at the origin:
+baseRect :: Float -> Float -> Shape
+baseRect width height = Rectangle (Point 0 0) (Point width height)
+
+-- These functions combined makes it easier to make shapes that are located at the origin of the coordinate system.
+-- > nudge (baseRect 40 100) 60 23
+-- = Rectangle (Point 60.0 63.0) (Point 100.0 123.0)
