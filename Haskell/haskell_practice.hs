@@ -1027,3 +1027,26 @@ baseRect width height = Rectangle (Point 0 0) (Point width height)
 -- These functions combined makes it easier to make shapes that are located at the origin of the coordinate system.
 -- > nudge (baseRect 40 100) 60 23
 -- = Rectangle (Point 60.0 63.0) (Point 100.0 123.0)
+
+-- [Record syntax]
+-- There exists an alternative way to write data types with record syntax.
+data Person = Person { firstName :: String
+                     , lastName :: String
+                     , age :: Int
+                     , height :: Float
+                     , phoneNumber :: String
+                     , flavor :: String
+                     } deriving (Show)
+
+-- By using record syntax you don't have to put the fields in a specific order, as long as
+-- you list all of them. 
+-- > data Car = Car String String Int deriving (Show)
+-- > Car "Ford" "Mustang" 1967
+-- = Car "Ford" "Mustang" 1967
+-- If we define this using record syntax, we can make a new car like this.
+data Car = Car {company :: String, model :: String, year :: Int} deriving (Show)
+-- > Car {company = "Ford", model = "Mustang", year = 1967}
+
+-- [Type parameters]
+-- A value construtor can take some values parameters and then produce a new value. For instance,
+ 

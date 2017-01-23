@@ -1,6 +1,15 @@
 ﻿// Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
 
+// Monad pattern:
+// bind : M<'T> -> ('T -> M<'U>) -> M<'U>
+// return : 'T -> M'<T>
+
+// Well-behaved monads should satisfy three rules, called the monad laws.
+
+
+
+
 let dayOfTheYear =
     seq {
         let months =
@@ -65,6 +74,8 @@ let totalResistance' r1 r2 r3 =
         )
     )
 
+
+seq { for i in 0 .. 3 -> (i, i * i) }
 
 
 [<EntryPoint>]
