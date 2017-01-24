@@ -18,6 +18,7 @@
 -- 'Let' keyword : Used to define a name (and more..)
 -- Predicate : condition
 -- '->' is naturally right-associative
+-- Auxiliary : hulp-
 
 -- [Chapter 1 : Introduction]
 -- [Calling functions]
@@ -1028,6 +1029,12 @@ baseRect width height = Rectangle (Point 0 0) (Point width height)
 -- > nudge (baseRect 40 100) 60 23
 -- = Rectangle (Point 60.0 63.0) (Point 100.0 123.0)
 
+-- By using Schape(..) you export all the value constructors for Shape.
+-- If you export all value constructors in a module (for example the shapes defined above), it means that people can make 
+-- shapes by using the Rectangle and Circle value constructors. If we decide to add more value constructors to our type later on
+-- we don't need to modify the exports. That's because using .. automaticly exports all the value constructors for a given type.
+
+
 -- [Record syntax]
 -- There exists an alternative way to write data types with record syntax.
 data Person = Person { firstName :: String
@@ -1048,5 +1055,9 @@ data Car = Car {company :: String, model :: String, year :: Int} deriving (Show)
 -- > Car {company = "Ford", model = "Mustang", year = 1967}
 
 -- [Type parameters]
--- A value construtor can take some values parameters and then produce a new value. For instance,
- 
+-- A value construtor can take some values parameters and then produce a new value. For instance, the Car constructor takes three values
+-- and produces a car value. In a similar manner, type constructors can takea types as parameters to produce new types.
+
+data Maybe a = Nothing | Just a
+
+  
